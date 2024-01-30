@@ -1,0 +1,71 @@
+# Change pip's cache directory to be inside the project directory since we can
+# only cache local items.
+variables:
+  PIP_CACHE_DIR: $CI_PROJECT_DIR/.cache/pip
+  PIPX_HOME: $CI_PROJECT_DIR/.local/pipx
+  PIPX_BIN_DIR: $CI_PROJECT_DIR/.local/bin
+  PYTHON_IMAGE: "${DOCKER_REGISTRY_PATH_PREFIX}python:3.10-slim"
+
+cache:
+  paths:
+    # We can't cache the pipx directories as pipx creates virtual environments in it's home directory
+    # and symlinks them into the bin dir which is on the path. The GitLab CI caching mechanism
+    # cannot follow or restore symlinks, so this link breaks, and the only way to fix it is to
+    # reinstall the package, making caching pointless. As far as I can see, pipx respects the
+    # pip cache, so capturing the downloaded packages in the cache there makes reinstall quick.
+    - .cache/pip
+    - .venv
+
+.required_packages: &required_packages
+  - apt-get update
+  - apt-get install -y make git python3-dev gcc
+  - pip install --upgrade pip
+  - pip install -U pip pipx
+  - export PATH=$PIPX_BIN_DIR:$PATH
+
+.install_deps: &install_deps
+  - pipx install poetry==1.7.1
+  - poetry config virtualenvs.in-project true
+  - poetry install
+
+stages:
+  - Static Analysis
+  - Unit Tests
+  - Compare golden
+  - Publish
+
+Flake8:
+  stage: Static Analysis
+  image: $PYTHON_IMAGE
+  before_script:
+    - *required_packages
+    - *install_deps
+  script:
+    - make flake8
+  rules:
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+Mypy:
+  stage: Static Analysis
+  image: $PYTHON_IMAGE
+  before_script:
+    - *required_packages
+    - *install_deps
+  script:
+    - make mypy
+  rules:
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+Pylint:
+  stage: Static Analysis
+  image: $PYTHON_IMAGE
+  before_script:
+    - *required_packages
+    - *install_deps
+  script:
+    - make pylint
+  rules:
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"

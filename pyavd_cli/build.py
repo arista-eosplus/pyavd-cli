@@ -1,3 +1,5 @@
+# pylint: disable=missing-module-docstring,missing-function-docstring
+
 import argparse
 import logging
 import os
@@ -6,13 +8,13 @@ from concurrent.futures import Executor, ProcessPoolExecutor, as_completed
 from pathlib import Path
 
 import yaml
-from ansible.inventory.manager import InventoryManager
-from ansible.parsing.dataloader import DataLoader
-from ansible.parsing.yaml.dumper import AnsibleDumper
-from ansible.plugins.loader import init_plugin_loader
-from ansible.template import Templar
-from ansible.vars.manager import VariableManager
-from pyavd import (
+from ansible.inventory.manager import InventoryManager  # type: ignore
+from ansible.parsing.dataloader import DataLoader  # type: ignore
+from ansible.parsing.yaml.dumper import AnsibleDumper  # type: ignore
+from ansible.plugins.loader import init_plugin_loader  # type: ignore
+from ansible.template import Templar  # type: ignore
+from ansible.vars.manager import VariableManager  # type: ignore
+from pyavd import (  # type: ignore
     get_avd_facts,
     get_device_config,
     get_device_structured_config,
@@ -55,6 +57,8 @@ def build_device_config(hostname: str, structured_config: dict, strict: bool):
 
 def build(
     inventory_path: Path,
+    fabric_name: str,
+    limit: str,
     intended_configs_path: Path,
     structured_configs_path: Path,
     max_workers: int = 10,
@@ -69,14 +73,13 @@ def build(
     templar = Templar(loader=loader)
 
     all_hostvars = {}
-    for hostname in inventory.hosts:
-        if hostname == "cvp":
-            continue
-
-        hostvars = variable_manager.get_vars(host=inventory.get_host(hostname))
+    for host in inventory.get_hosts(pattern=fabric_name):
+        hostvars = variable_manager.get_vars(host=inventory.get_host(host.name))
         templar.available_variables = hostvars
         template_hostvars = templar.template(hostvars, fail_on_undefined=False)
-        all_hostvars[hostname] = template_hostvars
+        all_hostvars[host.name] = template_hostvars
+
+    limit_hostnames = [host.name for host in inventory.get_hosts(pattern=limit)]
 
     with ProcessPoolExecutor(max_workers=max_workers) as executor:
         # Validate inputs
@@ -89,10 +92,12 @@ def build(
         avd_facts = get_avd_facts(all_hostvars)
         logger.debug("Generate facts time: %ds", (time.time() - start))
 
+        limit_hostvars = {hostname: hostvars for hostname, hostvars in all_hostvars.items() if hostname in limit_hostnames}
+
         # Build structured config
         start = time.time()
         structured_configs = build_and_write_all_structured_configs(
-            all_hostvars, avd_facts, structured_configs_path, templar, executor
+            limit_hostvars, avd_facts, structured_configs_path, templar, executor
         )
         logger.debug("Build structured config time: %ds", (time.time() - start))
 
@@ -163,11 +168,13 @@ def build_and_write_all_device_configs(
             fd.write(device_config)
 
 
-if __name__ == "__main__":
+def main():
     parser = argparse.ArgumentParser(description="Build AVD fabric.")
     parser.add_argument("-i", "--inventory-path", required=True, type=Path)
     parser.add_argument("-o", "--config-output-path", default=Path("intended"), type=Path)
-    parser.add_argument("-m", "--max-workers", nargs="?", default=os.cpu_count(), type=int)
+    parser.add_argument("-f", "--fabric-group-name", required=True, type=str)
+    parser.add_argument("-l", "--limit", default="all,!cvp", type=str)
+    parser.add_argument("-m", "--max-workers", default=os.cpu_count(), type=int)
     parser.add_argument(
         "--strict",
         action="store_true",
@@ -185,19 +192,29 @@ if __name__ == "__main__":
     structured_configs_path = config_output_path / "structured_configs"
     max_workers = args.max_workers
     strict = args.strict
+    fabric_group_name = args.fabric_group_name
+    limit = args.limit
 
-    logger.info("inventory_path: %s", inventory_path)
-    logger.info("intended_configs_path: %s", intended_configs_path)
-    logger.info("structured_configs_path: %s", structured_configs_path)
-    logger.info("max_workers: %s", max_workers)
-    logger.info("strict: %s", strict)
+    logger.debug("inventory_path: %s", inventory_path)
+    logger.debug("intended_configs_path: %s", intended_configs_path)
+    logger.debug("structured_configs_path: %s", structured_configs_path)
+    logger.debug("max_workers: %s", max_workers)
+    logger.debug("strict: %s", strict)
+    logger.debug("fabric_group_name: %s", fabric_group_name)
+    logger.debug("limit: %s", limit)
 
     start = time.time()
     build(
         inventory_path=inventory_path,
+        fabric_name=fabric_group_name,
+        limit=limit,
         intended_configs_path=intended_configs_path,
         structured_configs_path=structured_configs_path,
         max_workers=max_workers,
         strict=strict,
     )
     logger.info("Total build time: %ds", (time.time() - start))
+
+
+if __name__ == "__main__":
+    main()
