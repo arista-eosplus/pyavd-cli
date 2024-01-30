@@ -30,9 +30,7 @@ cache:
 
 stages:
   - Static Analysis
-  - Unit Tests
-  - Compare golden
-  - Publish
+  - Build
 
 Flake8:
   stage: Static Analysis
@@ -69,3 +67,18 @@ Pylint:
   rules:
     - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+Build-single-dc-l3ls-fabric:
+  stage: Build
+  image: $PYTHON_IMAGE
+  before_script:
+    - *required_packages
+    - *install_deps
+  script:
+    - poetry run pyavd-build -i tests/data/single-dc-l3ls-fabric/inventory.yml -o intended-single-dc-l3ls-fabric -f FABRIC -v
+  rules:
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  artifacts:
+    paths:
+      - intended-single-dc-l3ls-fabric
