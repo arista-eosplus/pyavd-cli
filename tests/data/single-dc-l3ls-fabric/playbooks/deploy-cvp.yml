@@ -1,0 +1,24 @@
+---
+- name: Include generated structured configs
+  hosts: FABRIC
+  tasks:
+    - name: Include all yml files
+      ansible.builtin.include_vars:
+        file: '../intended/structured_configs/{{ inventory_hostname }}.yml'
+
+- name: Deploy Configs
+  hosts: CLOUDVISION
+  tasks:
+    - name: Deploy Configurations to CloudVision
+      ansible.builtin.import_role:
+        name: arista.avd.eos_config_deploy_cvp
+      vars:
+        cv_collection: v3
+        configlets_prefix: AVD
+        state: present
+        execute_tasks: false
+        device_search_key: serialNumber
+        fabric_name: FABRIC
+        container_root: 'FABRIC'
+        device_inventory_mode: loose
+        device_apply_mode: strict

@@ -1,0 +1,10 @@
+__pycache__
+.vscode
+.mypy_cache
+.tox
+cov.xml
+.coverage
+.idea
+dist
+.env
+public

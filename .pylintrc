@@ -1,0 +1,8 @@
+[MAIN]
+max-line-length=130
+
+[MESSAGES CONTROL]
+disable=duplicate-code
+
+[FORMAT]
+good-names=fd,a,b,id

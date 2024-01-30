@@ -1,0 +1,12 @@
+.idea
+.venv
+__pycahe__
+.ansible
+.DS_Store
+.env
+.local
+.cache
+public
+documentation/devices
+documentation/fabric
+intended*

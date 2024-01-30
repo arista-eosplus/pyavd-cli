@@ -1,0 +1,16 @@
+---
+- name: Upload Configurations to Devices Using CloudVision Portal # (1)!
+  hosts: CLOUDVISION
+  gather_facts: false
+  connection: local
+
+  tasks:
+    - name: Upload cvp configlets
+      ansible.builtin.import_role:
+        name: arista.avd.cvp_configlet_upload
+      vars:
+        configlet_directory: 'intended/configs'
+        file_extension: 'cfg'
+        configlets_cvp_prefix: 'AVD'
+        execute_tasks: false
+        cv_collection: v3
