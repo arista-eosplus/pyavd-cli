@@ -26,4 +26,10 @@ build:
 pre-commits:
 	poetry run pre-commit install
 
-PHONY: install-deps build mypy pre-commits
+# Make sure the version is updated before publishing!
+ci-publish:
+	poetry config repositories.gitlab ${CI_SERVER_URL}/api/v4/projects/${CI_PROJECT_ID}/packages/pypi
+	poetry config certificates.gitlab.cert false
+	poetry publish --build --repository gitlab -u gitlab-ci-token -p ${CI_JOB_TOKEN}
+
+PHONY: install-deps build mypy pre-commits ci-publish
