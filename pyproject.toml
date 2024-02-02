@@ -1,9 +1,10 @@
 [tool.poetry]
 name = "pyavd-cli"
-version = "0.1.0"
+version = "0.1.1"
 description = "A collection of cli scripts to use pyavd"
 authors = ["Arista Networks <eosplus-dev@arista.com>"]
 readme = "README.md"
+include = ["CHANGELOG.md"]
 
 [tool.poetry.dependencies]
 python = "^3.10"
