@@ -132,7 +132,7 @@ def build_and_write_all_structured_configs(
     for future in as_completed(futures):
         hostname, structured_config = future.result()
 
-        templar.available_variables = avd_facts["avd_switch_facts"][hostname]
+        templar.available_variables = avd_facts["avd_switch_facts"][hostname] | structured_config
         template_structured_config = templar.template(structured_config)
         structured_configs[hostname] = template_structured_config
 
