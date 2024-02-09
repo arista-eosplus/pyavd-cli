@@ -39,7 +39,10 @@ def validate_hostvars(hostname: str, hostvars: dict, strict: bool):
 
 
 def build_structured_config(hostname: str, inputs: dict, avd_facts: dict):
-    structured_config = get_device_structured_config(hostname, inputs, avd_facts=avd_facts)
+    try:
+        structured_config = get_device_structured_config(hostname, inputs, avd_facts=avd_facts)
+    except Exception as exc:  # as of pyavd 4.5.0 AristaAvdDuplicateDataError can't be pickled, wrap exceptions with RuntimeError
+        raise RuntimeError(f"{exc}") from exc
 
     return hostname, structured_config
 
