@@ -1,5 +1,11 @@
 # Change Log
 
+## [0.1.2] 2024-2-9
+
+### Fixed
+
+- Wrap avd exceptions to avoid pickle errors with AristaAvdDuplicateDataError
+
 ## [0.1.1] 2024-2-2
 
 ### Fixed

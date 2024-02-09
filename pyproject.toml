@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pyavd-cli"
-version = "0.1.1"
+version = "0.1.2"
 description = "A collection of cli scripts to use pyavd"
 authors = ["Arista Networks <eosplus-dev@arista.com>"]
 readme = "README.md"
