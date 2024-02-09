@@ -58,7 +58,7 @@ def build_device_config(hostname: str, structured_config: dict, strict: bool):
     return hostname, get_device_config(structured_config)
 
 
-def build(
+def build(  # pylint: disable=too-many-arguments,too-many-locals
     inventory_path: Path,
     fabric_name: str,
     limit: str,
