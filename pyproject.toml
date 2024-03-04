@@ -6,6 +6,10 @@ authors = ["Arista Networks <eosplus-dev@arista.com>"]
 readme = "README.md"
 include = ["CHANGELOG.md"]
 
+[tool.poetry-dynamic-versioning]
+enable = true
+metadata = false
+
 [tool.poetry.dependencies]
 python = "^3.10"
 pyavd = "^4.5.0"
@@ -24,8 +28,8 @@ mypy = "^1.8.0"
 types-pyyaml = "^6.0.12.12"
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning>=1.0.0,<2.0.0"]
+build-backend = "poetry_dynamic_versioning.backend"
 
 [tool.black]
 line-length = 130
