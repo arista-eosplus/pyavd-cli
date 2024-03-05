@@ -25,5 +25,10 @@ jobs:
         run: make mypy
       - name: Pylint
         run: make pylint
-      - name: Build-single-dc-l3ls-fabric
+      - name: Build single-dc-l3ls-fabric
         run: poetry run pyavd-build -i tests/data/single-dc-l3ls-fabric/inventory.yml -o intended-single-dc-l3ls-fabric -f FABRIC -v
+      - name: Store single-dc-l3ls-fabric intended configs
+        uses: actions/upload-artifact@v4
+        with:
+          name: single-dc-l3ls-fabric configs
+          path: intended-single-dc-l3ls-fabric/
