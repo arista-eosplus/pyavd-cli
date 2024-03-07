@@ -1,10 +1,10 @@
 [tool.poetry]
 name = "pyavd-cli"
-version = "0.1.2"
+version = "0.1.2-dev"
 description = "A collection of cli scripts to use pyavd"
 authors = ["Arista Networks <eosplus-dev@arista.com>"]
 readme = "README.md"
-include = ["CHANGELOG.md"]
+include = ["CHANGELOG.md", "LICENSE"]
 
 [tool.poetry-dynamic-versioning]
 enable = true

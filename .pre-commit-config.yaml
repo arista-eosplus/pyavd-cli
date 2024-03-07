@@ -6,6 +6,26 @@ repos:
       - id: check-yaml
       - id: end-of-file-fixer
       - id: trailing-whitespace
+  - repo: https://github.com/python-poetry/poetry
+    rev: '1.8.1'
+    hooks:
+      - id: poetry-check
+      - id: poetry-lock
+        args: ["--no-update"]
+  - repo: https://github.com/Lucas-C/pre-commit-hooks
+    rev: v1.5.4
+    hooks:
+      - name: Check and insert license on Python files
+        id: insert-license
+        exclude: ansible_collections/arista/avd/(plugins/module_utils|tests/unit(/module_utils|/modules|))/__init__.py
+        files: .*\.py$
+        args:
+          - --license-filepath
+          - license-short.txt
+          - --use-current-year
+          - --allow-past-years
+          - --fuzzy-match-generates-todo
+          - --no-extra-eol
   - repo: https://github.com/psf/black
     rev: 23.1.0
     hooks:
