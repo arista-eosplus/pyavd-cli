@@ -2,7 +2,7 @@
 max-line-length=130
 
 [MESSAGES CONTROL]
-disable=duplicate-code
+disable=missing-docstring
 
 [FORMAT]
 good-names=fd,a,b,id
