@@ -16,7 +16,8 @@ from ansible.parsing.yaml.dumper import AnsibleDumper  # type: ignore
 from ansible.plugins.loader import init_plugin_loader  # type: ignore
 from ansible.template import Templar  # type: ignore
 from ansible.vars.manager import VariableManager  # type: ignore
-from pyavd import (  # type: ignore
+from pyavd import __version__ as pyavd_version  # type: ignore
+from pyavd import (
     get_avd_facts,
     get_device_config,
     get_device_structured_config,
@@ -200,6 +201,7 @@ def main():
     fabric_group_name = args.fabric_group_name
     limit = args.limit
 
+    logger.debug("pyavd version: %s", pyavd_version)
     logger.debug("inventory_path: %s", inventory_path)
     logger.debug("intended_configs_path: %s", intended_configs_path)
     logger.debug("structured_configs_path: %s", structured_configs_path)
