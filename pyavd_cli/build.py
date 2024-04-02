@@ -7,7 +7,9 @@ import logging
 import os
 import time
 from concurrent.futures import Executor, ProcessPoolExecutor, as_completed
+from functools import wraps
 from pathlib import Path
+from typing import Callable, Optional
 
 import yaml
 from ansible.inventory.manager import InventoryManager  # type: ignore
@@ -30,11 +32,25 @@ os.environ["PYAVD"] = "1"
 logger = logging.getLogger()
 
 
+def log_execution_time(logger_fn: Callable = logger.debug, log_prefix: Optional[str] = None) -> Callable:
+    def decorator_log_execution_time(func: Callable) -> Callable:
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            start = time.perf_counter()
+            value = func(*args, **kwargs)
+            logger_fn("%s: %fs", log_prefix or func.__name__, (time.perf_counter() - start))
+            return value
+
+        return wrapper
+
+    return decorator_log_execution_time
+
+
 def validate_hostvars(hostname: str, hostvars: dict, strict: bool):
     results = validate_inputs(hostvars)
     if results.failed:
         for result in results.validation_errors:
-            logger.error(result)
+            logger.error("%s: %s", hostname, result)
         if strict:
             raise RuntimeError(f"{hostname} validate_inputs failed")
 
@@ -54,64 +70,14 @@ def build_device_config(hostname: str, structured_config: dict, strict: bool):
     results = validate_structured_config(structured_config)
     if results.failed:
         for result in results.validation_errors:
-            logger.error(result)
+            logger.error("%s: %s", hostname, result)
         if strict:
             raise RuntimeError(f"{hostname} validate_structured_config failed")
 
     return hostname, get_device_config(structured_config)
 
 
-def build(  # pylint: disable=too-many-arguments,too-many-locals
-    inventory_path: Path,
-    fabric_name: str,
-    limit: str,
-    intended_configs_path: Path,
-    structured_configs_path: Path,
-    max_workers: int = 10,
-    strict: bool = False,
-):
-    init_plugin_loader()
-
-    loader = DataLoader()
-    inventory = InventoryManager(loader=loader, sources=[inventory_path.as_posix()])
-    variable_manager = VariableManager(loader=loader, inventory=inventory)
-
-    templar = Templar(loader=loader)
-
-    all_hostvars = {}
-    for host in inventory.get_hosts(pattern=fabric_name):
-        hostvars = variable_manager.get_vars(host=inventory.get_host(host.name))
-        templar.available_variables = hostvars
-        template_hostvars = templar.template(hostvars, fail_on_undefined=False)
-        all_hostvars[host.name] = template_hostvars
-
-    limit_hostnames = [host.name for host in inventory.get_hosts(pattern=limit)]
-
-    with ProcessPoolExecutor(max_workers=max_workers) as executor:
-        # Validate inputs
-        start = time.time()
-        all_hostvars = validate_all_inputs(all_hostvars, strict, executor)
-        logger.debug("Validate inputs time: %ds", (time.time() - start))
-
-        # Generate facts
-        start = time.time()
-        avd_facts = get_avd_facts(all_hostvars)
-        logger.debug("Generate facts time: %ds", (time.time() - start))
-
-        limit_hostvars = {hostname: hostvars for hostname, hostvars in all_hostvars.items() if hostname in limit_hostnames}
-
-        # Build structured config
-        start = time.time()
-        structured_configs = build_and_write_all_structured_configs(
-            limit_hostvars, avd_facts, structured_configs_path, templar, executor
-        )
-        logger.debug("Build structured config time: %ds", (time.time() - start))
-
-        start = time.time()
-        build_and_write_all_device_configs(intended_configs_path, structured_configs, strict, executor)
-        logger.debug("Build designed config time: %ds", (time.time() - start))
-
-
+@log_execution_time(log_prefix="Validate inputs time")
 def validate_all_inputs(all_hostvars: dict, strict: bool, executor: Executor) -> dict:
     validated_inputs = {}
     futures = [executor.submit(validate_hostvars, hostname, hostvars, strict) for hostname, hostvars in all_hostvars.items()]
@@ -122,6 +88,7 @@ def validate_all_inputs(all_hostvars: dict, strict: bool, executor: Executor) ->
     return validated_inputs
 
 
+@log_execution_time(log_prefix="Build structured config time")
 def build_and_write_all_structured_configs(
     all_hostvars: dict,
     avd_facts: dict,
@@ -154,6 +121,7 @@ def build_and_write_all_structured_configs(
     return structured_configs
 
 
+@log_execution_time(log_prefix="Build device config time")
 def build_and_write_all_device_configs(
     intended_configs_path: Path,
     structured_configs: dict,
@@ -172,6 +140,51 @@ def build_and_write_all_device_configs(
 
         with open(intended_configs_path / f"{hostname}.cfg", mode="w", encoding="utf8") as fd:
             fd.write(device_config)
+
+
+@log_execution_time(log_prefix="Total build time")
+def build(  # pylint: disable=too-many-arguments,too-many-locals
+    inventory_path: Path,
+    fabric_name: str,
+    limit: str,
+    intended_configs_path: Path,
+    structured_configs_path: Path,
+    max_workers: int = 10,
+    strict: bool = False,
+):
+    init_plugin_loader()
+
+    loader = DataLoader()
+    inventory = InventoryManager(loader=loader, sources=[inventory_path.as_posix()])
+    variable_manager = VariableManager(loader=loader, inventory=inventory)
+
+    templar = Templar(loader=loader)
+
+    all_hostvars = {}
+    for host in inventory.get_hosts(pattern=fabric_name):
+        hostvars = variable_manager.get_vars(host=inventory.get_host(host.name))
+        templar.available_variables = hostvars
+        template_hostvars = templar.template(hostvars, fail_on_undefined=False)
+        all_hostvars[host.name] = template_hostvars
+
+    limit_hostnames = [host.name for host in inventory.get_hosts(pattern=limit)]
+
+    with ProcessPoolExecutor(max_workers=max_workers) as executor:
+        # Validate inputs
+        all_hostvars = validate_all_inputs(all_hostvars, strict, executor)
+
+        # Generate facts
+        avd_facts = log_execution_time(log_prefix="Generate facts time")(get_avd_facts)(all_hostvars)
+
+        limit_hostvars = {hostname: hostvars for hostname, hostvars in all_hostvars.items() if hostname in limit_hostnames}
+
+        # Build structured config
+        structured_configs = build_and_write_all_structured_configs(
+            limit_hostvars, avd_facts, structured_configs_path, templar, executor
+        )
+
+        # Generate device config
+        build_and_write_all_device_configs(intended_configs_path, structured_configs, strict, executor)
 
 
 def main():
@@ -210,7 +223,6 @@ def main():
     logger.debug("fabric_group_name: %s", fabric_group_name)
     logger.debug("limit: %s", limit)
 
-    start = time.time()
     build(
         inventory_path=inventory_path,
         fabric_name=fabric_group_name,
@@ -220,7 +232,6 @@ def main():
         max_workers=max_workers,
         strict=strict,
     )
-    logger.info("Total build time: %ds", (time.time() - start))
 
 
 if __name__ == "__main__":
