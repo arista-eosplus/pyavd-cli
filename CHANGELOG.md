@@ -1,5 +1,11 @@
 # Change Log
 
+## [0.1.3] 2024-4-2
+
+### Changed
+
+- Log pyavd version by @dlobato in https://github.com/arista-eosplus/pyavd-cli/pull/6
+
 ## [0.1.2] 2024-2-9
 
 ### Fixed
