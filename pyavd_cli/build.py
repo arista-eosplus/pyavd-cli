@@ -149,6 +149,7 @@ def build(  # pylint: disable=too-many-arguments,too-many-locals
     limit: str,
     intended_configs_path: Path,
     structured_configs_path: Path,
+    avd_facts_path: Optional[Path] = None,
     max_workers: int = 10,
     strict: bool = False,
 ):
@@ -175,6 +176,17 @@ def build(  # pylint: disable=too-many-arguments,too-many-locals
 
         # Generate facts
         avd_facts = log_execution_time(log_prefix="Generate facts time")(get_avd_facts)(all_hostvars)
+        if avd_facts_path is not None:
+            avd_facts_path.parent.mkdir(parents=True, exist_ok=True)
+            with open(avd_facts_path, mode="w", encoding="utf8") as fd:
+                yaml.dump(
+                    avd_facts,
+                    fd,
+                    Dumper=AnsibleDumper,
+                    indent=2,
+                    sort_keys=False,
+                    width=130,
+                )
 
         limit_hostvars = {hostname: hostvars for hostname, hostvars in all_hostvars.items() if hostname in limit_hostnames}
 
@@ -191,6 +203,7 @@ def main():
     parser = argparse.ArgumentParser(description="Build AVD fabric.")
     parser.add_argument("-i", "--inventory-path", required=True, type=Path)
     parser.add_argument("-o", "--config-output-path", default=Path("intended"), type=Path)
+    parser.add_argument("--avd-facts-path", type=Path)
     parser.add_argument("-f", "--fabric-group-name", required=True, type=str)
     parser.add_argument("-l", "--limit", default="all,!cvp", type=str)
     parser.add_argument("-m", "--max-workers", default=os.cpu_count(), type=int)
@@ -209,6 +222,7 @@ def main():
     config_output_path = args.config_output_path
     intended_configs_path = config_output_path / "configs"
     structured_configs_path = config_output_path / "structured_configs"
+    avd_facts_path = args.avd_facts_path
     max_workers = args.max_workers
     strict = args.strict
     fabric_group_name = args.fabric_group_name
@@ -218,6 +232,7 @@ def main():
     logger.debug("inventory_path: %s", inventory_path)
     logger.debug("intended_configs_path: %s", intended_configs_path)
     logger.debug("structured_configs_path: %s", structured_configs_path)
+    logger.debug("avd_facts_path: %s", avd_facts_path)
     logger.debug("max_workers: %s", max_workers)
     logger.debug("strict: %s", strict)
     logger.debug("fabric_group_name: %s", fabric_group_name)
@@ -229,6 +244,7 @@ def main():
         limit=limit,
         intended_configs_path=intended_configs_path,
         structured_configs_path=structured_configs_path,
+        avd_facts_path=avd_facts_path,
         max_workers=max_workers,
         strict=strict,
     )
