@@ -201,12 +201,21 @@ def build(  # pylint: disable=too-many-arguments,too-many-locals
 
 def main():
     parser = argparse.ArgumentParser(description="Build AVD fabric.")
-    parser.add_argument("-i", "--inventory-path", required=True, type=Path)
-    parser.add_argument("-o", "--config-output-path", default=Path("intended"), type=Path)
-    parser.add_argument("--avd-facts-path", type=Path)
-    parser.add_argument("-f", "--fabric-group-name", required=True, type=str)
-    parser.add_argument("-l", "--limit", default="all,!cvp", type=str)
-    parser.add_argument("-m", "--max-workers", default=os.cpu_count(), type=int)
+    parser.add_argument("-i", "--inventory-path", required=True, type=Path, help="Path to the inventory file.")
+    parser.add_argument("-o", "--config-output-path", default=Path("intended"), type=Path, help="Path to the output directory.")
+    parser.add_argument("--avd-facts-path", type=Path, help="If provided AVD facts will be written to this path.")
+    parser.add_argument("-f", "--fabric-group-name", required=True, type=str, help="Name of the fabric group.")
+    parser.add_argument(
+        "-l",
+        "--limit",
+        default="all,!cvp",
+        type=str,
+        help=(
+            "Limit filter for inventory. See https://docs.ansible.com/ansible/latest/inventory_guide/intro_patterns.html"
+            "#patterns-and-ad-hoc-commands."
+        ),
+    )
+    parser.add_argument("-m", "--max-workers", default=os.cpu_count(), type=int, help="Maximum number of parallel workers.")
     parser.add_argument(
         "--strict",
         action="store_true",
