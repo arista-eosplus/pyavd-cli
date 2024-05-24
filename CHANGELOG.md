@@ -1,5 +1,11 @@
 # Change Log
 
+## [0.1.4] 2024-5-24
+
+### Added
+
+ - "--avd-facts-path" flag to store avd facts to a file
+
 ## [0.1.3] 2024-4-2
 
 ### Changed
