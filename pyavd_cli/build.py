@@ -9,9 +9,10 @@ import time
 from concurrent.futures import Executor, ProcessPoolExecutor, as_completed
 from functools import wraps
 from pathlib import Path
-from typing import Callable, Optional
+from typing import Callable, List, Optional
 
 import yaml
+from ansible.cli import CLI  # type: ignore
 from ansible.inventory.manager import InventoryManager  # type: ignore
 from ansible.parsing.dataloader import DataLoader  # type: ignore
 from ansible.parsing.yaml.dumper import AnsibleDumper  # type: ignore
@@ -152,10 +153,13 @@ def build(  # pylint: disable=too-many-arguments,too-many-locals
     avd_facts_path: Optional[Path] = None,
     max_workers: int = 10,
     strict: bool = False,
+    vault_ids: Optional[List[str]] = None,
 ):
     init_plugin_loader()
 
     loader = DataLoader()
+    if vault_ids:
+        CLI.setup_vault_secrets(loader, vault_ids=vault_ids)
     inventory = InventoryManager(loader=loader, sources=[inventory_path.as_posix()])
     variable_manager = VariableManager(loader=loader, inventory=inventory)
 
@@ -221,6 +225,16 @@ def main():
         action="store_true",
         help="Use strict mode and fail if there is validation errors",
     )
+    parser.add_argument(
+        "--vault-id",
+        type=str,
+        action="extend",
+        nargs="*",
+        help=(
+            "Vault ID used to decrypt the inventory. Multiple vault IDs can be provided. See "
+            "https://docs.ansible.com/ansible/latest/vault_guide/vault_using_encrypted_content.html#passing-vault-ids"
+        ),
+    )
     parser.add_argument("-v", "--verbose", action="store_true")
 
     args = parser.parse_args()
@@ -236,6 +250,7 @@ def main():
     strict = args.strict
     fabric_group_name = args.fabric_group_name
     limit = args.limit
+    vault_ids = args.vault_id
 
     logger.debug("pyavd version: %s", pyavd_version)
     logger.debug("inventory_path: %s", inventory_path)
@@ -246,6 +261,7 @@ def main():
     logger.debug("strict: %s", strict)
     logger.debug("fabric_group_name: %s", fabric_group_name)
     logger.debug("limit: %s", limit)
+    logger.debug("vault_ids: %s", vault_ids)
 
     build(
         inventory_path=inventory_path,
@@ -256,6 +272,7 @@ def main():
         avd_facts_path=avd_facts_path,
         max_workers=max_workers,
         strict=strict,
+        vault_ids=vault_ids,
     )
 
 
