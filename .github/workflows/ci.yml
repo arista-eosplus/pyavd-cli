@@ -3,7 +3,7 @@ name: CI
 on: [push]
 
 jobs:
-  build:
+  static-analisys:
     runs-on: ubuntu-latest
 
     steps:
@@ -16,7 +16,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -U pip pipx
-          pipx install poetry==1.8.1
+          pipx install poetry==1.8.3
           poetry config virtualenvs.in-project true
           poetry install
       - name: Flake8
@@ -25,12 +25,33 @@ jobs:
         run: make mypy
       - name: Pylint
         run: make pylint
-      - name: Build single-dc-l3ls-fabric
-        run: poetry run pyavd-build -i tests/data/single-dc-l3ls-fabric/inventory.yml -o intended-single-dc-l3ls-fabric -f FABRIC -v
+
+  build-and-compare:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        version: [ "4.5.0", "4.6.0", "4.7.0", "4.7.1", "4.8.0" ]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - name: Create venv
+        run: |
+          python -m venv .venv
+          .venv/bin/python -m pip install --upgrade pip setuptools pyavd==${{ matrix.version }}
+          .venv/bin/python -m pip install .
+      - name: Install referencing for 4.8.0
+        if: ${{ matrix.version=='4.8.0' }}
+        run: .venv/bin/python -m pip install "referencing>=0.35.0"
+      - name: Build fabric
+        run: |
+          .venv/bin/pyavd-build -i tests/data/single-dc-l3ls-fabric/inventory.yml -o intended-single-dc-l3ls-fabric -f FABRIC -v
       - name: Store single-dc-l3ls-fabric intended configs
         uses: actions/upload-artifact@v4
         with:
-          name: single-dc-l3ls-fabric configs
+          name: single-dc-l3ls-fabric configs pyavd@${{ matrix.version }}
           path: intended-single-dc-l3ls-fabric/
       - name: Compare with golden
-        run: diff --color -ry --suppress-common-lines tests/data/single-dc-l3ls-fabric/intended-golden intended-single-dc-l3ls-fabric
+        run: diff --color -ry --suppress-common-lines tests/data/single-dc-l3ls-fabric/intended-golden-${{ matrix.version }} intended-single-dc-l3ls-fabric
