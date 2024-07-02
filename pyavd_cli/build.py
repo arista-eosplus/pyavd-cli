@@ -55,6 +55,9 @@ def validate_hostvars(hostname: str, hostvars: dict, strict: bool):
         if strict:
             raise RuntimeError(f"{hostname} validate_inputs failed")
 
+    for deprecation_warning in results.deprecation_warnings:
+        logger.warning("%s: %s", hostname, deprecation_warning)
+
     return hostname, hostvars
 
 
@@ -74,6 +77,9 @@ def build_device_config(hostname: str, structured_config: dict, strict: bool):
             logger.error("%s: %s", hostname, result)
         if strict:
             raise RuntimeError(f"{hostname} validate_structured_config failed")
+
+    for deprecation_warning in results.deprecation_warnings:
+        logger.warning("%s: %s", hostname, deprecation_warning)
 
     return hostname, get_device_config(structured_config)
 
