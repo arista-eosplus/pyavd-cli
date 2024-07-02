@@ -1,5 +1,15 @@
 # Change Log
 
+## [0.1.5] 2024-7-02
+
+### Added
+
+ - new "--vault-id" flag to handle vaulted files https://github.com/arista-eosplus/pyavd-cli/pull/36
+
+### Changed
+
+ - update dependencies
+
 ## [0.1.4] 2024-5-24
 
 ### Added
