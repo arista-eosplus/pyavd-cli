@@ -19,6 +19,7 @@ from ansible.parsing.yaml.dumper import AnsibleDumper  # type: ignore
 from ansible.plugins.loader import init_plugin_loader  # type: ignore
 from ansible.template import Templar  # type: ignore
 from ansible.vars.manager import VariableManager  # type: ignore
+from pyavd import ValidationResult  # type: ignore
 from pyavd import __version__ as pyavd_version  # type: ignore
 from pyavd import (
     get_avd_facts,
@@ -47,13 +48,21 @@ def log_execution_time(logger_fn: Callable = logger.debug, log_prefix: Optional[
     return decorator_log_execution_time
 
 
+def log_host_validation_result(hostname: str, result: ValidationResult) -> None:
+    for validation_error in result.validation_errors:
+        logger.error("%s: %s", hostname, validation_error)
+
+    for deprecation_warning in result.deprecation_warnings:
+        logger.warning("%s: %s", hostname, deprecation_warning)
+
+
 def validate_hostvars(hostname: str, hostvars: dict, strict: bool):
-    results = validate_inputs(hostvars)
-    if results.failed:
-        for result in results.validation_errors:
-            logger.error("%s: %s", hostname, result)
-        if strict:
-            raise RuntimeError(f"{hostname} validate_inputs failed")
+    validation_result = validate_inputs(hostvars)
+
+    log_host_validation_result(hostname, validation_result)
+
+    if validation_result.failed and strict:
+        raise RuntimeError(f"{hostname} validate_inputs failed")
 
     return hostname, hostvars
 
@@ -68,12 +77,12 @@ def build_structured_config(hostname: str, inputs: dict, avd_facts: dict):
 
 
 def build_device_config(hostname: str, structured_config: dict, strict: bool):
-    results = validate_structured_config(structured_config)
-    if results.failed:
-        for result in results.validation_errors:
-            logger.error("%s: %s", hostname, result)
-        if strict:
-            raise RuntimeError(f"{hostname} validate_structured_config failed")
+    validation_result = validate_structured_config(structured_config)
+
+    log_host_validation_result(hostname, validation_result)
+
+    if validation_result.failed and strict:
+        raise RuntimeError(f"{hostname} validate_structured_config failed")
 
     return hostname, get_device_config(structured_config)
 
