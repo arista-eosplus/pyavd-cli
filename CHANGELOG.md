@@ -1,5 +1,11 @@
 # Change Log
 
+## [0.1.6] 2024-7-10
+
+### Added
+
+ - log deprecation warnings https://github.com/arista-eosplus/pyavd-cli/pull/43
+
 ## [0.1.5] 2024-7-02
 
 ### Added
