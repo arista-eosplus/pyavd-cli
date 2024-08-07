@@ -221,11 +221,11 @@ def main():
     parser.add_argument(
         "-l",
         "--limit",
-        default="all,!cvp",
+        default=None,
         type=str,
         help=(
             "Limit filter for inventory. See https://docs.ansible.com/ansible/latest/inventory_guide/intro_patterns.html"
-            "#patterns-and-ad-hoc-commands."
+            "#patterns-and-ad-hoc-commands. If not set it will default to fabric-group-name"
         ),
     )
     parser.add_argument("-m", "--max-workers", default=os.cpu_count(), type=int, help="Maximum number of parallel workers.")
@@ -258,7 +258,7 @@ def main():
     max_workers = args.max_workers
     strict = args.strict
     fabric_group_name = args.fabric_group_name
-    limit = args.limit
+    limit = args.limit or args.fabric_group_name
     vault_ids = args.vault_id
 
     logger.debug("pyavd version: %s", pyavd_version)
