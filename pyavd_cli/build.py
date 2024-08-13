@@ -32,7 +32,7 @@ from pyavd import (
 
 os.environ["PYAVD"] = "1"
 
-logger = logging.getLogger()
+logger = logging.getLogger("pyavd-build")
 
 
 def log_execution_time(logger_fn: Callable = logger.debug, log_prefix: Optional[str] = None) -> Callable:
