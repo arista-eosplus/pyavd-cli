@@ -1,5 +1,12 @@
 # Change Log
 
+## [0.1.7] 2024-8-13
+
+### Changed
+
+ - Limit defaults to fabric group name to select all fabric hosts https://github.com/arista-eosplus/pyavd-cli/pull/56
+ - Refactor tasks to speedup process https://github.com/arista-eosplus/pyavd-cli/pull/57
+
 ## [0.1.6] 2024-7-10
 
 ### Added
