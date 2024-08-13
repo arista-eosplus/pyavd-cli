@@ -41,7 +41,9 @@ jobs:
         run: |
           python -m venv .venv
           .venv/bin/python -m pip install --upgrade pip setuptools pyavd==${{ matrix.version }}
-          .venv/bin/python -m pip install .
+          .venv/bin/python -m pip install . netaddr
+      - name: Install ansible.utils
+        run: .venv/bin/ansible-galaxy collection install ansible.utils
       - name: Install referencing for 4.8.0
         if: ${{ matrix.version=='4.8.0' }}
         run: .venv/bin/python -m pip install "referencing>=0.35.0"
