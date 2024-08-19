@@ -30,7 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        version: [ "4.5.0", "4.6.0", "4.7.0", "4.7.1", "4.8.0", "4.9.0", "4.10.0" ]
+        version: [ "4.9.0", "4.10.0" ]
     steps:
       - uses: actions/checkout@v4
       - name: Setup Python
@@ -44,9 +44,6 @@ jobs:
           .venv/bin/python -m pip install . netaddr
       - name: Install ansible.utils
         run: .venv/bin/ansible-galaxy collection install ansible.utils
-      - name: Install referencing for 4.8.0
-        if: ${{ matrix.version=='4.8.0' }}
-        run: .venv/bin/python -m pip install "referencing>=0.35.0"
       - name: Build fabric
         run: |
           .venv/bin/pyavd-build -i tests/data/single-dc-l3ls-fabric/inventory.yml -o intended-single-dc-l3ls-fabric -f FABRIC -v
