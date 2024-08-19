@@ -12,9 +12,7 @@ metadata = false
 
 [tool.poetry.dependencies]
 python = "^3.10"
-pyavd = "^4.5.0"
-ansible-core = ">=2.16.0, <2.18.0"
-
+pyavd = {extras = ["ansible", "ansible-collection"], version = ">=4.9.0"}
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.1.1"
