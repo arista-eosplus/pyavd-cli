@@ -1,5 +1,11 @@
 # Change Log
 
+## [0.1.8] 2024-8-27
+
+### Changed
+
+ - Use pyavd extra dependencies and set version to support pyavd >=4.9 https://github.com/arista-eosplus/pyavd-cli/pull/61
+
 ## [0.1.7] 2024-8-13
 
 ### Changed
