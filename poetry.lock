@@ -1177,12 +1177,12 @@ virtualenv = ">=20.10.0"
 
 [[package]]
 name = "pyavd"
-version = "4.10.0"
+version = "4.10.2"
 description = "Arista Validated Designs"
 optional = false
 python-versions = ">=3.9"
 files = [
-    {file = "pyavd-4.10.0-py3-none-any.whl", hash = "sha256:5464edd3d6d9d499903fe8519366800960bf80fa12facf006eb21ade1f1044e9"},
+    {file = "pyavd-4.10.2-py3-none-any.whl", hash = "sha256:19b371b941cd4edabdbd2606a81b398808e381cb275f412485b98e2a1d4930f5"},
 ]
 
 [package.dependencies]
