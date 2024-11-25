@@ -47,18 +47,18 @@ resolvelib = ">=0.5.3,<1.1.0"
 
 [[package]]
 name = "anta"
-version = "1.0.0"
+version = "1.1.0"
 description = "Arista Network Test Automation (ANTA) Framework"
 optional = false
 python-versions = ">=3.9"
 files = [
-    {file = "anta-1.0.0-py3-none-any.whl", hash = "sha256:555c8c3fcdf68d1c6c0c1d1bdfafa1a2b17e0f35be9d06d5826769bbdb3c1a1b"},
-    {file = "anta-1.0.0.tar.gz", hash = "sha256:0d5c72105d548f93474a0e8f139f4f6d76e8368e497fec06d34f8faf61f1ed63"},
+    {file = "anta-1.1.0-py3-none-any.whl", hash = "sha256:105523a087752635bb62c4afa0041e6a00337ec9415adc79698ef5d62610b1e8"},
+    {file = "anta-1.1.0.tar.gz", hash = "sha256:e827b00d5e6bd0b6624f4c1d48ec58539327859e1568982a55e4575ab90e5746"},
 ]
 
 [package.dependencies]
 aiocache = ">=0.12.2"
-asyncssh = ">=2.13.2"
+asyncssh = ">=2.16"
 cvprac = ">=1.3.1"
 eval-type-backport = ">=0.1.3"
 httpx = ">=0.27.0"
@@ -71,8 +71,8 @@ rich = ">=13.5.2,<14"
 
 [package.extras]
 cli = ["click (>=8.1.6,<8.2.0)", "click-help-colors (>=0.9)"]
-dev = ["bumpver (>=2023.1129)", "codespell (>=2.2.6,<2.4.0)", "mypy (>=1.10,<2.0)", "mypy-extensions (>=1.0,<2.0)", "pre-commit (>=3.3.3)", "pylint (>=2.17.5)", "pylint-pydantic (>=0.2.4)", "pytest (>=7.4.0)", "pytest-asyncio (>=0.21.1)", "pytest-cov (>=4.1.0)", "pytest-dependency", "pytest-html (>=3.2.0)", "pytest-metadata (>=3.0.0)", "ruff (>=0.3.7,<0.5.0)", "tox (>=4.10.0,<5.0.0)", "types-PyYAML", "types-pyOpenSSL", "types-requests", "typing-extensions", "yamllint (>=1.32.0)"]
-doc = ["fontawesome-markdown", "griffe", "mike (==2.1.1)", "mkdocs (>=1.3.1)", "mkdocs-autorefs (>=0.4.1)", "mkdocs-bootswatch (>=1.1)", "mkdocs-git-revision-date-localized-plugin (>=1.1.0)", "mkdocs-git-revision-date-plugin (>=0.3.2)", "mkdocs-glightbox (>=0.4.0)", "mkdocs-material (>=8.3.9)", "mkdocs-material-extensions (>=1.0.3)", "mkdocstrings[python] (>=0.20.0)"]
+dev = ["bumpver (>=2023.1129)", "codespell (>=2.2.6,<2.4.0)", "mypy (>=1.10,<2.0)", "mypy-extensions (>=1.0,<2.0)", "pre-commit (>=3.3.3)", "pylint (>=2.17.5)", "pylint-pydantic (>=0.2.4)", "pytest (>=7.4.0)", "pytest-asyncio (>=0.21.1)", "pytest-codspeed (>=2.2.0)", "pytest-cov (>=4.1.0)", "pytest-dependency", "pytest-html (>=3.2.0)", "pytest-httpx (>=0.30.0)", "pytest-metadata (>=3.0.0)", "respx", "respx (>=0.21.1)", "ruff (>=0.5.4,<0.7.0)", "tox (>=4.10.0,<5.0.0)", "types-PyYAML", "types-pyOpenSSL", "types-requests", "typing-extensions", "yamllint (>=1.32.0)"]
+doc = ["black (>=24.10.0)", "fontawesome-markdown (>=0.2.6)", "griffe (>=1.2.0)", "mike (==2.1.3)", "mkdocs (>=1.6.1)", "mkdocs-autorefs (>=1.2.0)", "mkdocs-bootswatch (>=1.1)", "mkdocs-git-revision-date-localized-plugin (>=1.2.8)", "mkdocs-git-revision-date-plugin (>=0.3.2)", "mkdocs-glightbox (>=0.4.0)", "mkdocs-material (>=9.5.34)", "mkdocs-material-extensions (>=1.3.1)", "mkdocstrings-python (>=1.11.0)", "mkdocstrings[python] (>=0.26.0)"]
 
 [[package]]
 name = "anyio"
@@ -1177,31 +1177,31 @@ virtualenv = ">=20.10.0"
 
 [[package]]
 name = "pyavd"
-version = "4.10.0"
+version = "5.1.0"
 description = "Arista Validated Designs"
 optional = false
-python-versions = ">=3.9"
+python-versions = ">=3.10"
 files = [
-    {file = "pyavd-4.10.0-py3-none-any.whl", hash = "sha256:5464edd3d6d9d499903fe8519366800960bf80fa12facf006eb21ade1f1044e9"},
+    {file = "pyavd-5.1.0-py3-none-any.whl", hash = "sha256:46acdf84f3b9db5a491905c9a56ff6d66dd669bc2fb8bfa4d054a3929cb31fd8"},
 ]
 
 [package.dependencies]
-ansible-core = {version = ">=2.15.0,<2.18.0", optional = true, markers = "extra == \"ansible\""}
-anta = {version = ">=1.0.0", optional = true, markers = "extra == \"ansible-collection\""}
+ansible-core = {version = ">=2.15.0,<2.19.0", optional = true, markers = "extra == \"ansible\""}
+anta = {version = ">=1.1.0", optional = true, markers = "extra == \"ansible-collection\""}
 aristaproto = ">=0.1.1"
 cryptography = ">=38.0.4"
-cvprac = {version = ">=1.3.1", optional = true, markers = "extra == \"ansible-collection\""}
+cvprac = {version = ">=1.4.0", optional = true, markers = "extra == \"ansible-collection\""}
 deepmerge = ">=1.1.0"
 Jinja2 = ">=3.0"
-jsonschema = ">=4.10.3"
+jsonschema = {version = ">=3.2.0", optional = true, markers = "extra == \"ansible-collection\""}
 netaddr = {version = ">=0.7.19", optional = true, markers = "extra == \"ansible-collection\""}
 PyYAML = {version = ">=6.0.0", optional = true, markers = "extra == \"ansible-collection\""}
 requests = ">=2.27.0"
 treelib = {version = ">=1.5.5", optional = true, markers = "extra == \"ansible-collection\""}
 
 [package.extras]
-ansible = ["ansible-core (>=2.15.0,<2.18.0)", "pyavd[ansible-collection]"]
-ansible-collection = ["PyYAML (>=6.0.0)", "anta (>=1.0.0)", "cvprac (>=1.3.1)", "netaddr (>=0.7.19)", "treelib (>=1.5.5)"]
+ansible = ["ansible-core (>=2.15.0,<2.19.0)", "pyavd[ansible-collection]"]
+ansible-collection = ["PyYAML (>=6.0.0)", "anta (>=1.1.0)", "cvprac (>=1.4.0)", "jsonschema (>=3.2.0)", "netaddr (>=0.7.19)", "treelib (>=1.5.5)"]
 
 [[package]]
 name = "pycodestyle"
