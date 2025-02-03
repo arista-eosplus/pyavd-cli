@@ -15,7 +15,7 @@ python = "^3.10"
 pyavd = {extras = ["ansible", "ansible-collection"], version = ">=4.9.0"}
 
 [tool.poetry.group.dev.dependencies]
-black = "^24.1.1"
+black = ">=24.1.1,<26.0.0"
 isort = "^5.13.2"
 flake8 = "^7.0.0"
 flake8-docstrings = "^1.7.0"
