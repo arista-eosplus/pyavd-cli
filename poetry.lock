@@ -1203,16 +1203,16 @@ virtualenv = ">=20.10.0"
 
 [[package]]
 name = "pyavd"
-version = "5.1.0"
+version = "5.2.2"
 description = "Arista Validated Designs"
 optional = false
 python-versions = ">=3.10"
 files = [
-    {file = "pyavd-5.1.0-py3-none-any.whl", hash = "sha256:46acdf84f3b9db5a491905c9a56ff6d66dd669bc2fb8bfa4d054a3929cb31fd8"},
+    {file = "pyavd-5.2.2-py3-none-any.whl", hash = "sha256:07d557221fe704cad5f49d84e3a82f76fd5ec8c3110c1e50a11fd51f34b3e2e8"},
 ]
 
 [package.dependencies]
-ansible-core = {version = ">=2.15.0,<2.19.0", optional = true, markers = "extra == \"ansible\""}
+ansible-core = {version = ">=2.16.0,<2.19.0", optional = true, markers = "extra == \"ansible\""}
 anta = {version = ">=1.1.0", optional = true, markers = "extra == \"ansible-collection\""}
 aristaproto = ">=0.1.1"
 cryptography = ">=38.0.4"
@@ -1226,7 +1226,7 @@ requests = ">=2.27.0"
 treelib = {version = ">=1.5.5", optional = true, markers = "extra == \"ansible-collection\""}
 
 [package.extras]
-ansible = ["ansible-core (>=2.15.0,<2.19.0)", "pyavd[ansible-collection]"]
+ansible = ["ansible-core (>=2.16.0,<2.19.0)", "pyavd[ansible-collection]"]
 ansible-collection = ["PyYAML (>=6.0.0)", "anta (>=1.1.0)", "cvprac (>=1.4.0)", "jsonschema (>=3.2.0)", "netaddr (>=0.7.19)", "treelib (>=1.5.5)"]
 
 [[package]]
