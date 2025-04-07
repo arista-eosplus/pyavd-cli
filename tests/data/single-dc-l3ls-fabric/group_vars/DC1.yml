@@ -12,6 +12,8 @@ spine:
     loopback_ipv4_pool: 10.255.0.0/27
     # ASN to be used by BGP
     bgp_as: 65100
+    # Management IP to be assigned to the management interface
+    mgmt_ip: "{{ mgmt_ip }}"
 
   # Definition of nodes contained in this group.
   # Specific configuration of device must take place under the node definition. Each node inherits all values defined under 'defaults'
@@ -20,12 +22,9 @@ spine:
     - name: dc1-spine1
       # Device ID definition. An integer number used for internal calculations (ie. IPv4 address of the loopback_ipv4_pool among others)
       id: 1
-      # Management IP to be assigned to the management interface
-      mgmt_ip: "{{ mgmt_ip }}"
 
     - name: dc1-spine2
       id: 2
-      mgmt_ip: "{{ mgmt_ip }}"
 
 # L3 Leaf switch group
 l3leaf:
@@ -52,6 +51,8 @@ l3leaf:
     virtual_router_mac_address: 00:1c:73:00:00:99
     spanning_tree_priority: 4096
     spanning_tree_mode: mstp
+    # Management IP to be assigned to the management interface
+    mgmt_ip: "{{ mgmt_ip }}"
 
   # If two nodes (and only two) are in the same node_group, they will automatically form an MLAG pair
   node_groups:
@@ -64,7 +65,6 @@ l3leaf:
         # Definition of hostnames under the node_group
         - name: dc1-leaf1a
           id: 1
-          mgmt_ip: "{{ mgmt_ip }}"
           # Definition of the port to be used in the uplink device facing this device.
           # Note that the number of elements in this list must match the length of 'uplink_switches' as well as 'uplink_interfaces'
           uplink_switch_interfaces:
@@ -72,7 +72,6 @@ l3leaf:
             - Ethernet1
         - name: dc1-leaf1b
           id: 2
-          mgmt_ip: "{{ mgmt_ip }}"
           uplink_switch_interfaces:
             - Ethernet2
             - Ethernet2
@@ -82,13 +81,11 @@ l3leaf:
       nodes:
         - name: dc1-leaf2a
           id: 3
-          mgmt_ip: "{{ mgmt_ip }}"
           uplink_switch_interfaces:
             - Ethernet3
             - Ethernet3
         - name: dc1-leaf2b
           id: 4
-          mgmt_ip: "{{ mgmt_ip }}"
           uplink_switch_interfaces:
             - Ethernet4
             - Ethernet4
@@ -99,6 +96,8 @@ l2leaf:
   defaults:
     platform: vEOS-lab
     spanning_tree_mode: mstp
+    # Management IP to be assigned to the management interface
+    mgmt_ip: "{{ mgmt_ip }}"
 
   node_groups:
     - group: DC1_L2_LEAF1
@@ -106,7 +105,6 @@ l2leaf:
       nodes:
         - name: dc1-leaf1c
           id: 1
-          mgmt_ip: "{{ mgmt_ip }}"
           uplink_switch_interfaces:
             - Ethernet8
             - Ethernet8
@@ -116,7 +114,6 @@ l2leaf:
       nodes:
         - name: dc1-leaf2c
           id: 2
-          mgmt_ip: "{{ mgmt_ip }}"
           uplink_switch_interfaces:
             - Ethernet8
             - Ethernet8
