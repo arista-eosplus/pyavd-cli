@@ -5,7 +5,7 @@ ifeq (, $(shell which poetry))
 	$(error "No poetry in $(PATH), see https://python-poetry.org/docs/#installation to install it in your system")
 endif
 	poetry config virtualenvs.in-project true
-	poetry install
+	poetry sync --all-extras
 
 ruff:
 	poetry run ruff check .
