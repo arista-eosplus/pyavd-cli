@@ -1,4 +1,4 @@
-# Copyright (c) 2024 Arista Networks, Inc.
+# Copyright (c) 2024-2025 Arista Networks, Inc.
 # Use of this source code is governed by the Apache License 2.0
 # that can be found in the LICENSE file.
 
@@ -20,15 +20,15 @@ from ansible.parsing.yaml.dumper import AnsibleDumper  # type: ignore
 from ansible.plugins.loader import init_plugin_loader  # type: ignore
 from ansible.template import Templar  # type: ignore
 from ansible.vars.manager import VariableManager  # type: ignore
-from pyavd import ValidationResult  # type: ignore
-from pyavd import __version__ as pyavd_version  # type: ignore
 from pyavd import (
+    ValidationResult,  # type: ignore
     get_avd_facts,
     get_device_config,
     get_device_structured_config,
     validate_inputs,
     validate_structured_config,
 )
+from pyavd import __version__ as pyavd_version  # type: ignore
 
 os.environ["PYAVD"] = "1"
 
