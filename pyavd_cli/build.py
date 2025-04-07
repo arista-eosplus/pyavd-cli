@@ -14,11 +14,13 @@ from typing import Callable, List, Optional
 
 import yaml
 from ansible.cli import CLI  # type: ignore
+from ansible.inventory.host import Host  # type: ignore
 from ansible.inventory.manager import InventoryManager  # type: ignore
 from ansible.parsing.dataloader import DataLoader  # type: ignore
 from ansible.parsing.yaml.dumper import AnsibleDumper  # type: ignore
 from ansible.plugins.loader import init_plugin_loader  # type: ignore
 from ansible.template import Templar  # type: ignore
+from ansible.vars.hostvars import HostVars  # type: ignore
 from ansible.vars.manager import VariableManager  # type: ignore
 from pyavd import (  # type: ignore
     ValidationResult,
@@ -33,6 +35,32 @@ from pyavd import __version__ as pyavd_version  # type: ignore
 os.environ["PYAVD"] = "1"
 
 logger = logging.getLogger("pyavd-build")
+
+init_plugin_loader()
+
+
+class Inventory:  # pylint: disable=too-few-public-methods
+    """Ansible Inventory wrapper."""
+
+    def __init__(self, inventory_path: Path, data_loader: DataLoader = DataLoader()) -> None:
+        """Initialize Ansible Inventory Manager."""
+        self.inventory_path = inventory_path
+        self.data_loader = data_loader
+        self.inventory_manager = InventoryManager(loader=self.data_loader, sources=[self.inventory_path.as_posix()], parse=True)
+        self.variable_manager = VariableManager(loader=self.data_loader, inventory=self.inventory_manager)
+        self.hostvars = HostVars(
+            inventory=self.inventory_manager,
+            variable_manager=self.variable_manager,
+            loader=self.data_loader,
+        )
+
+    def get_hosts(self, pattern: str, order: str = "sorted") -> list[Host]:
+        """Takes a pattern or list of patterns and returns a list of matching inventory host."""
+        return self.inventory_manager.get_hosts(pattern=pattern, order=order)
+
+    def get_vars(self, host_name: str) -> dict:
+        """Get host vars."""
+        return dict(self.hostvars[host_name])
 
 
 def log_execution_time(logger_fn: Callable = logger.debug, log_prefix: Optional[str] = None) -> Callable:
@@ -110,16 +138,11 @@ def build_and_write_device_config(  # pylint: disable=too-many-arguments
 
 
 @log_execution_time(log_prefix="Load inputs time")
-def get_fabric_hostvars(fabric_name: str, inventory: InventoryManager, loader: DataLoader) -> dict:
-    variable_manager = VariableManager(loader=loader, inventory=inventory)
-    templar = Templar(loader=loader)
-
+def get_fabric_hostvars(fabric_name: str, inventory: Inventory) -> dict:
     all_hostvars = {}
     for host in inventory.get_hosts(pattern=fabric_name):
-        hostvars = variable_manager.get_vars(host=inventory.get_host(host.name))
-        templar.available_variables = hostvars
-        template_hostvars = templar.template(hostvars, fail_on_undefined=False)
-        all_hostvars[host.name] = template_hostvars
+        host_name = str(host.name)
+        all_hostvars[host_name] = inventory.get_vars(host_name=host_name)
 
     return all_hostvars
 
@@ -278,15 +301,13 @@ def main():
     logger.debug("vault_ids: %s", args.vault_id)
 
     # load inventory
-    init_plugin_loader()
-    loader = DataLoader()
+    inventory = Inventory(inventory_path=inventory_path)
     if args.vault_id:
-        CLI.setup_vault_secrets(loader, vault_ids=args.vault_id)
-    inventory_manager = InventoryManager(loader=loader, sources=[inventory_path.as_posix()])
+        CLI.setup_vault_secrets(inventory.data_loader, vault_ids=args.vault_id)
 
-    fabric_hostvars = get_fabric_hostvars(args.fabric_group_name, inventory_manager, loader)
+    fabric_hostvars = get_fabric_hostvars(args.fabric_group_name, inventory)
 
-    target_hosts = [host.name for host in inventory_manager.get_hosts(pattern=limit)]
+    target_hosts = [host.name for host in inventory.get_hosts(pattern=limit)]
     if len(target_hosts) == 0:
         logger.error("No hosts matched pattern=%s", limit)
         sys.exit(1)
