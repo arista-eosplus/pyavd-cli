@@ -20,8 +20,8 @@ from ansible.parsing.yaml.dumper import AnsibleDumper  # type: ignore
 from ansible.plugins.loader import init_plugin_loader  # type: ignore
 from ansible.template import Templar  # type: ignore
 from ansible.vars.manager import VariableManager  # type: ignore
-from pyavd import (
-    ValidationResult,  # type: ignore
+from pyavd import (  # type: ignore
+    ValidationResult,
     get_avd_facts,
     get_device_config,
     get_device_structured_config,
