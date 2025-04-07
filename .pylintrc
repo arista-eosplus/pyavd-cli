@@ -1,8 +1,0 @@
-[MAIN]
-max-line-length=130
-
-[MESSAGES CONTROL]
-disable=missing-docstring
-
-[FORMAT]
-good-names=fd,a,b,id

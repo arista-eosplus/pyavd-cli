@@ -1,5 +1,0 @@
-[flake8]
-max-line-length = 130
-exclude = .venv, .git .vscode, .tox, .pytest_cache, .mypy_cache, __pycache__
-docstring-convention = google
-ignore = D104, D103, D100

@@ -1,18 +1,5 @@
 PROJECT_MODULE:=pyavd_cli
 
-pylint:
-	poetry run pylint $(PROJECT_MODULE) || poetry run pylint-exit -efail -wfail $$?
-
-mypy:
-	poetry run mypy $(PROJECT_MODULE)
-
-flake8:
-	poetry run flake8 $(PROJECT_MODULE)
-
-format:
-	poetry run black $(PROJECT_MODULE)
-	poetry run isort $(PROJECT_MODULE)
-
 install-deps: ## Install required dependencies
 ifeq (, $(shell which poetry))
 	$(error "No poetry in $(PATH), see https://python-poetry.org/docs/#installation to install it in your system")
@@ -20,8 +7,17 @@ endif
 	poetry config virtualenvs.in-project true
 	poetry install
 
+ruff:
+	poetry run ruff check .
+
+format:
+	poetry run ruff format
+
+mypy:
+	poetry run mypy $(PROJECT_MODULE)
+
 build:
-	poetry build
+	poetry run python -m build
 
 pre-commits:
 	poetry run pre-commit install
@@ -32,4 +28,4 @@ ci-publish:
 	poetry config certificates.gitlab.cert false
 	poetry publish --build --repository gitlab -u gitlab-ci-token -p ${CI_JOB_TOKEN}
 
-PHONY: install-deps build mypy pre-commits ci-publish
+PHONY: install-deps ruff format build unit mypy pre-commits ci-publish version-patch

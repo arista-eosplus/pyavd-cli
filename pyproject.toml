@@ -1,40 +1,50 @@
-[tool.poetry]
+[project]
 name = "pyavd-cli"
 version = "0.0.0"
 description = "A collection of cli scripts to use pyavd"
-authors = ["Arista Networks <eosplus-dev@arista.com>"]
+authors = [{ name = "Arista Networks", email = "ps-sw-dev-team@arista.com" }]
 readme = "README.md"
 include = ["CHANGELOG.md", "LICENSE"]
+dependencies = [
+    "pyavd[ansible]>=4.9.0",
+]
+requires-python = ">=3.11,<4"
+
+[project.optional-dependencies]
+dev = [
+    "mypy~=1.15.0",
+    "pre-commit~=3.8.0",
+    "ruff~=0.9.4",
+    "build~=1.2.0",
+    "types-pyyaml~=6.0.12.20241230",
+]
+
+[tool.poetry]
+version = "0.0.0"  # base version
 
 [tool.poetry-dynamic-versioning]
 enable = true
 metadata = false
 
-[tool.poetry.dependencies]
-python = "^3.10"
-pyavd = {extras = ["ansible", "ansible-collection"], version = ">=4.9.0"}
-
-[tool.poetry.group.dev.dependencies]
-black = "^24.1.1"
-isort = "^5.13.2"
-flake8 = "^7.0.0"
-flake8-docstrings = "^1.7.0"
-pre-commit = ">=3.6,<5.0"
-pylint = "^3.0.3"
-pylint-exit = "^1.2.0"
-mypy = "^1.8.0"
-types-pyyaml = "^6.0.12.12"
 
 [build-system]
-requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning>=1.0.0,<2.0.0"]
+requires = ["poetry-core>=2.0.0,<3.0.0", "poetry-dynamic-versioning>=1.0.0,<2.0.0"]
 build-backend = "poetry_dynamic_versioning.backend"
 
-[tool.black]
+[tool.ruff]
 line-length = 130
-preview = true
 
-[tool.isort]
-profile = "black"
+[tool.ruff.lint]
+select = [
+    # isort
+    "I",
+    # pycodestyle
+    "E",
+    # Pyflakes
+    "F",
+    # flake8-simplify
+    "SIM"
+]
 
-[tool.poetry.scripts]
+[project.scripts]
 pyavd-build = "pyavd_cli.build:main"
