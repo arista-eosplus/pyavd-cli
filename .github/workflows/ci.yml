@@ -30,7 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        version: [ "4.9.0", "4.10.0", "5.0.0", "5.1.0" ]
+        version: [ "5.1.0", "5.2.3" ]
     steps:
       - uses: actions/checkout@v4
       - name: Setup Python
@@ -40,7 +40,7 @@ jobs:
       - name: Create venv
         run: |
           python -m venv .venv
-          .venv/bin/python -m pip install --upgrade pip setuptools pyavd==${{ matrix.version }}
+          .venv/bin/python -m pip install --upgrade pip setuptools "pyavd[ansible]==${{ matrix.version }}"
           .venv/bin/python -m pip install . netaddr
       - name: Install ansible.utils
         run: .venv/bin/ansible-galaxy collection install ansible.utils
