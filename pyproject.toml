@@ -1,6 +1,6 @@
 [project]
 name = "pyavd-cli"
-version = "0.0.0"
+dynamic = [ "version" ]
 description = "A collection of cli scripts to use pyavd"
 authors = [{ name = "Arista Networks", email = "ps-sw-dev-team@arista.com" }]
 readme = "README.md"
