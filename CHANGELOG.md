@@ -1,5 +1,12 @@
 # Change Log
 
+## [0.1.9] 2025-4-07
+
+### Changed
+
+ - updated dependencies
+ - Use ansible HostVars to read inventory variables https://github.com/arista-eosplus/pyavd-cli/pull/90
+
 ## [0.1.8] 2024-8-27
 
 ### Changed
