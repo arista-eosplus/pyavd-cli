@@ -6,7 +6,7 @@ authors = [{ name = "Arista Networks", email = "ps-sw-dev-team@arista.com" }]
 readme = "README.md"
 include = ["CHANGELOG.md", "LICENSE"]
 dependencies = [
-    "pyavd[ansible]>=4.9.0",
+    "pyavd[ansible]==5.3.0-dev4",
 ]
 requires-python = ">=3.11,<4"
 
