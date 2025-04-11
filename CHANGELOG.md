@@ -1,5 +1,12 @@
 # Change Log
 
+## [0.2.0] 2025-4-11
+
+### Changed
+
+ - 5.3.x new avd facts handling (#97)
+ - updated support to pyavd >=5.3
+
 ## [0.1.9] 2025-4-07
 
 ### Changed
