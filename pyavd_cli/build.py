@@ -109,7 +109,7 @@ def build_and_write_device_config(  # pylint: disable=too-many-arguments
     except Exception as exc:  # as of pyavd 4.5.0 AristaAvdDuplicateDataError can't be pickled, wrap exceptions with RuntimeError
         raise RuntimeError(f"{exc}") from exc
 
-    templar = Templar(loader=DataLoader(), variables=avd_facts["avd_switch_facts"][hostname] | structured_config)
+    templar = Templar(loader=DataLoader(), variables=avd_facts[hostname]._as_dict() | structured_config)
     template_structured_config = templar.template(structured_config)
 
     # Write structured config
