@@ -1091,13 +1091,13 @@ virtualenv = ">=20.10.0"
 
 [[package]]
 name = "pyavd"
-version = "5.3.0.dev4"
+version = "5.3.0"
 description = "Arista Validated Designs"
 optional = false
 python-versions = ">=3.10"
 groups = ["main"]
 files = [
-    {file = "pyavd-5.3.0.dev4-py3-none-any.whl", hash = "sha256:686a4d1fa19123626ff067ca387f2faa6275286b5d2ddc62ce370c4595b6f65a"},
+    {file = "pyavd-5.3.0-py3-none-any.whl", hash = "sha256:8467eee395ae25eb061ef5288c3cc329c6be01b6e595d993c0d4094060536269"},
 ]
 
 [package.dependencies]
@@ -1764,4 +1764,4 @@ dev = ["build", "mypy", "pre-commit", "ruff", "types-pyyaml"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11,<4"
-content-hash = "13b30374a4c337ba540c0a83920f0c5d28250b8a42cca87f31340a5c736ae034"
+content-hash = "208769b555165286c1a882c2800bf0d686c5d9ba558e7e5b206383f9a921b789"
