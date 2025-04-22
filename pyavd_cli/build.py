@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import Callable, List, Optional
 
 import yaml
+import ansible.constants as C
 from ansible.cli import CLI  # type: ignore
 from ansible.inventory.host import Host  # type: ignore
 from ansible.inventory.manager import InventoryManager  # type: ignore
@@ -249,6 +250,7 @@ def main():
     parser.add_argument("-i", "--inventory-path", required=True, type=Path, help="Path to the inventory file.")
     parser.add_argument("-o", "--config-output-path", default=Path("intended"), type=Path, help="Path to the output directory.")
     parser.add_argument("--avd-facts-path", type=Path, help="If provided AVD facts will be written to this path.")
+    parser.add_argument("--global-vars-path", type=Path, help="Enable the avd.global_vars plugin and load variables from the path specified.")
     parser.add_argument("-f", "--fabric-group-name", required=True, type=str, help="Name of the fabric group.")
     parser.add_argument(
         "-l",
@@ -287,6 +289,12 @@ def main():
     intended_configs_path = config_output_path / "configs"
     structured_configs_path = config_output_path / "structured_configs"
     avd_facts_path = args.avd_facts_path.resolve() if args.avd_facts_path else None
+    global_vars_path = args.global_vars_path.resolve() if args.global_vars_path else None
+    if global_vars_path:
+        # Enable the global vars plugin
+        plugins_enabled = C.VARIABLE_PLUGINS_ENABLED
+        C.set_constant("VARIABLE_PLUGINS_ENABLED", ['arista.avd.global_vars'] + plugins_enabled)
+        os.environ["ARISTA_AVD_GLOBAL_VARS_PATHS"] = str(global_vars_path)
     limit = args.limit or args.fabric_group_name
 
     logger.debug("pyavd version: %s", pyavd_version)
@@ -294,6 +302,7 @@ def main():
     logger.debug("intended_configs_path: %s", intended_configs_path)
     logger.debug("structured_configs_path: %s", structured_configs_path)
     logger.debug("avd_facts_path: %s", avd_facts_path)
+    logger.debug("global_vars_path: %s", global_vars_path)
     logger.debug("max_workers: %s", args.max_workers)
     logger.debug("strict: %s", args.strict)
     logger.debug("fabric_group_name: %s", args.fabric_group_name)
