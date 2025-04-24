@@ -1,0 +1,16 @@
+# CloudVision Portal definitions
+cvp_instance_ips:
+  - 192.168.1.12
+terminattr_smashexcludes: "ale,flexCounter,hardware,kni,pulse,strata"
+terminattr_ingestexclude: "/Sysdb/cell/1/agent,/Sysdb/cell/2/agent"
+terminattr_disable_aaa: true
+
+# DNS Server
+name_servers:
+  - 192.168.1.1
+
+# NTP Servers IP or DNS name, first NTP server will be prefered, and sourced from Management VRF
+ntp_settings:
+  server_vrf: use_mgmt_interface_vrf
+  servers:
+    - name: 0.pool.ntp.org

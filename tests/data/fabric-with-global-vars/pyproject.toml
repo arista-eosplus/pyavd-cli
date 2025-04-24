@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools >= 64.0.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = []
+
+[project]
+name = "fabric-with-global-vars"
+version = "0.0.0"
+description = "A fabric with global vars"
+authors = [{ name = "Arista Networks", email = "ps-sw-dev-team@arista.com" }]
+readme = "README.md"
+dependencies = [
+    "pyavd[ansible]==5.3.0",
+    "pyavd-cli",
+]
+requires-python = ">=3.11"
+
+[project.optional-dependencies]
+dev = ["pip-tools"]
+
+[tool.pip-tools.compile]
+emit-find-links = false
+strip-extras = true

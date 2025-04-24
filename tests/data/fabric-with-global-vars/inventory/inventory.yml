@@ -1,0 +1,41 @@
+---
+all:
+  children:
+    FABRIC:
+      children:
+        DC1:
+          vars:
+            mgmt_interface_vrf: MGMT
+            mgmt_interface: Management1
+            mgmt_gateway: "{{ mgmt_ip | ansible.utils.ipaddr('network/prefix') | ansible.utils.ipaddr('1') | ansible.utils.ipaddr('address') }}"
+          children:
+            DC1_SPINES:
+              hosts:
+                dc1-spine1:
+                  mgmt_ip: 172.16.1.11/24
+                dc1-spine2:
+                  mgmt_ip: 172.16.1.12/24
+            DC1_L3_LEAVES:
+              hosts:
+                dc1-leaf1a:
+                  mgmt_ip: 172.16.1.101/24
+                dc1-leaf1b:
+                  mgmt_ip: 172.16.1.102/24
+                dc1-leaf2a:
+                  mgmt_ip: 172.16.1.103/24
+                dc1-leaf2b:
+                  mgmt_ip: 172.16.1.104/24
+            DC1_L2_LEAVES:
+              hosts:
+                dc1-leaf1c:
+                  mgmt_ip: 172.16.1.151/24
+                dc1-leaf2c:
+                  mgmt_ip: 172.16.1.152/24
+    NETWORK_SERVICES:
+      children:
+        DC1_L3_LEAVES:
+        DC1_L2_LEAVES:
+    CONNECTED_ENDPOINTS:
+      children:
+        DC1_L3_LEAVES:
+        DC1_L2_LEAVES:

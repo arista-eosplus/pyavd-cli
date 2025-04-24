@@ -1,0 +1,13 @@
+.idea
+.vscode
+.venv
+__pycahe__
+.ansible
+.DS_Store
+.env
+.local
+.cache
+public
+inventory/documentation
+inventory/intended*
+*.egg-info
