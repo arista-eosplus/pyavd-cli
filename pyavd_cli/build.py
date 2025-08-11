@@ -42,10 +42,13 @@ init_plugin_loader()
 class Inventory:  # pylint: disable=too-few-public-methods
     """Ansible Inventory wrapper."""
 
-    def __init__(self, inventory_path: Path, data_loader: DataLoader = DataLoader()) -> None:
+    def __init__(self, inventory_path: Path, data_loader: DataLoader = DataLoader(), vault_ids: Optional[list] = None) -> None:
         """Initialize Ansible Inventory Manager."""
         self.inventory_path = inventory_path
         self.data_loader = data_loader
+        if vault_ids:
+            CLI.setup_vault_secrets(self.data_loader, vault_ids=vault_ids)
+
         self.inventory_manager = InventoryManager(loader=self.data_loader, sources=[self.inventory_path.as_posix()], parse=True)
         self.variable_manager = VariableManager(loader=self.data_loader, inventory=self.inventory_manager)
         self.hostvars = HostVars(
@@ -301,9 +304,7 @@ def main():
     logger.debug("vault_ids: %s", args.vault_id)
 
     # load inventory
-    inventory = Inventory(inventory_path=inventory_path)
-    if args.vault_id:
-        CLI.setup_vault_secrets(inventory.data_loader, vault_ids=args.vault_id)
+    inventory = Inventory(inventory_path=inventory_path, vault_ids=args.vault_id)
 
     fabric_hostvars = get_fabric_hostvars(args.fabric_group_name, inventory)
 
