@@ -31,6 +31,8 @@ from pyavd import (  # type: ignore
     validate_structured_config,
 )
 from pyavd import __version__ as pyavd_version  # type: ignore
+from pyavd._eos_designs.eos_designs_facts import EosDesignsFacts
+from pyavd.api.pool_manager import PoolManager
 
 os.environ["PYAVD"] = "1"
 
@@ -166,8 +168,14 @@ def validate_all_inputs(all_hostvars: dict, strict: bool, executor: Executor) ->
 
 
 @log_execution_time(log_prefix="Generate facts time")
-def generate_avd_facts(all_hostvars: dict, avd_facts_path: Optional[Path] = None):
-    avd_facts = get_avd_facts(all_hostvars)
+def generate_avd_facts(
+    all_hostvars: dict,
+    avd_facts_path: Optional[Path] = None,
+    pool_manager_output_path: Optional[Path] = None,
+) -> dict[str, EosDesignsFacts]:
+    pool_manager = PoolManager(output_dir=pool_manager_output_path) if pool_manager_output_path else None
+
+    avd_facts = get_avd_facts(all_hostvars, pool_manager=pool_manager)
     if avd_facts_path is not None:
         avd_facts_path.parent.mkdir(parents=True, exist_ok=True)
         with open(avd_facts_path, mode="w", encoding="utf8") as fd:
@@ -217,6 +225,7 @@ def build(  # pylint: disable=too-many-arguments
     fabric_hostvars: dict,
     target_hosts: List[str],
     intended_configs_path: Path,
+    pool_manager_output_path: Path,
     structured_configs_path: Path,
     avd_facts_path: Optional[Path] = None,
     max_workers: Optional[int] = None,
@@ -227,7 +236,11 @@ def build(  # pylint: disable=too-many-arguments
         validated_fabric_hostvars = validate_all_inputs(all_hostvars=fabric_hostvars, strict=strict, executor=executor)
 
         # Generate facts
-        avd_facts = generate_avd_facts(all_hostvars=validated_fabric_hostvars, avd_facts_path=avd_facts_path)
+        avd_facts = generate_avd_facts(
+            all_hostvars=validated_fabric_hostvars,
+            avd_facts_path=avd_facts_path,
+            pool_manager_output_path=pool_manager_output_path,
+        )
 
         target_hostvars = {
             hostname: hostvars for hostname, hostvars in validated_fabric_hostvars.items() if hostname in target_hosts
@@ -251,6 +264,13 @@ def main():
     parser = argparse.ArgumentParser(description="Build AVD fabric.")
     parser.add_argument("-i", "--inventory-path", required=True, type=Path, help="Path to the inventory file.")
     parser.add_argument("-o", "--config-output-path", default=Path("intended"), type=Path, help="Path to the output directory.")
+    parser.add_argument(
+        "-p",
+        "--pool-manager-output-path",
+        default=Path("intended", "data"),
+        type=Path,
+        help="Path to the pool manager output directory.",
+    )
     parser.add_argument("--avd-facts-path", type=Path, help="If provided AVD facts will be written to this path.")
     parser.add_argument("-f", "--fabric-group-name", required=True, type=str, help="Name of the fabric group.")
     parser.add_argument(
@@ -287,6 +307,7 @@ def main():
 
     inventory_path = args.inventory_path.resolve()
     config_output_path = args.config_output_path.resolve()
+    pool_manager_output_path = args.pool_manager_output_path.resolve()
     intended_configs_path = config_output_path / "configs"
     structured_configs_path = config_output_path / "structured_configs"
     avd_facts_path = args.avd_facts_path.resolve() if args.avd_facts_path else None
@@ -295,6 +316,7 @@ def main():
     logger.debug("pyavd version: %s", pyavd_version)
     logger.debug("inventory_path: %s", inventory_path)
     logger.debug("intended_configs_path: %s", intended_configs_path)
+    logger.debug("pool_manager_output_path: %s", pool_manager_output_path)
     logger.debug("structured_configs_path: %s", structured_configs_path)
     logger.debug("avd_facts_path: %s", avd_facts_path)
     logger.debug("max_workers: %s", args.max_workers)
@@ -321,6 +343,7 @@ def main():
         fabric_hostvars=fabric_hostvars,
         target_hosts=target_hosts,
         intended_configs_path=intended_configs_path,
+        pool_manager_output_path=pool_manager_output_path,
         structured_configs_path=structured_configs_path,
         avd_facts_path=avd_facts_path,
         max_workers=args.max_workers,
