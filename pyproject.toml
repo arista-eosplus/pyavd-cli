@@ -16,7 +16,7 @@ dev = [
     "pre-commit~=3.8.0",
     "ruff~=0.9.4",
     "build~=1.2.0",
-    "types-pyyaml~=6.0.12.20241230",
+    "types-pyyaml~=6.0.12.20250915",
 ]
 
 [tool.poetry]
