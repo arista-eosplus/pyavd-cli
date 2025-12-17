@@ -2048,4 +2048,4 @@ dev = ["build", "mypy", "pre-commit", "ruff", "types-pyyaml"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11,<4"
-content-hash = "28a6d62a18f29fe4219021b54eef8f451d5b1ef0fd3f61e4e701da6e142b2f21"
+content-hash = "8165612b2ec1553ec178c67947a3978c45281b2f4a73a2c6d124c85e6a685642"
