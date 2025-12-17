@@ -57,7 +57,7 @@ jobs:
         run: |
           .venv/bin/pyavd-build -i tests/data/single-dc-l3ls-fabric/inventory.yml -o intended-single-dc-l3ls-fabric -f FABRIC -v
       - name: Store single-dc-l3ls-fabric intended configs
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: single-dc-l3ls-fabric configs pyavd@${{ matrix.version }}
           path: intended-single-dc-l3ls-fabric/
